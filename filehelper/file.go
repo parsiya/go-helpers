@@ -65,7 +65,7 @@ func WriteFile(input []byte, file string, overwrite bool) error {
 	if err != nil {
 		return fmt.Errorf("filehelper.WriteFile: write to file - %s", err.Error())
 	}
-	// Check if all input is written.
+	// Check if all input was written.
 	if n != len(input) {
 		return fmt.Errorf("filehelper.WriteFile: only %d bytes written out of %d", n, len(input))
 	}

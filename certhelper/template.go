@@ -13,9 +13,9 @@ import (
 // CATemplate returns an x509.Certificate template for a root CA.
 // algo can be "RSA" or "EC" (case-insensitive).
 // Default values:
-//     	validity = CertValidity in constants.go. 1 year.
-// 		maxPathLen = 0 - can only sign leaf certificates.
-//		keyUsage = x509.KeyUsageCertSign - CAKeyUsageConstant
+// 	validity = CertValidity in constants.go. 1 year.
+// 	maxPathLen = 0 - can only sign leaf certificates.
+//	keyUsage = x509.KeyUsageCertSign - CAKeyUsageConstant
 func CATemplate(commonName, orgUnit, serialNumber, countryCode string,
 	algo string) (*x509.Certificate, error) {
 	return CustomCATemplate(commonName, orgUnit, serialNumber, countryCode,
@@ -23,13 +23,13 @@ func CATemplate(commonName, orgUnit, serialNumber, countryCode string,
 }
 
 // CustomCATemplate returns an x509.Certificate template for a root CA.
-// algo must be "RSA" or "EC" (case-insensitive).
-// validity is in years. For example, 1.
-// if maxPathLen is zero, the certificate can only sign leaf certificates and
-// MaxPathLenZero is also set to true.
-// keyUsage is a mix of https://golang.org/pkg/crypto/x509/#KeyUsage. For example,
-// x509.KeyUsageCertSign | x509.KeyUsageCRLSign.
-// For more customization, manually create a https://golang.org/pkg/crypto/x509/#Certificate.
+// 	algo must be "RSA" or "EC" (case-insensitive).
+// 	validity is in years. For example, 1.
+// 	if maxPathLen is zero, the certificate can only sign leaf certificates and
+// 	MaxPathLenZero is also set to true.
+// 	keyUsage is a mix of https://golang.org/pkg/crypto/x509/#KeyUsage. For example,
+// 	x509.KeyUsageCertSign | x509.KeyUsageCRLSign.
+// 	For more customization, manually create a https://golang.org/pkg/crypto/x509/#Certificate.
 func CustomCATemplate(commonName, orgUnit, serialNumber, countryCode, algo string,
 	validity, maxPathLen int, keyUsage x509.KeyUsage) (*x509.Certificate, error) {
 

@@ -77,15 +77,13 @@ func CustomECLeafCert(commonName, orgUnit, serialNumber, countryCode, curve stri
 	}
 	// Parse private key and generate the certificate.
 	var certDER []byte
-	switch t := caPrivKey.(type) {
+	switch k := caPrivKey.(type) {
 	case *rsa.PrivateKey:
-		rsaPrivKey, _ := caPrivKey.(*rsa.PrivateKey)
-		certDER, err = x509.CreateCertificate(rand.Reader, tmpl, caCert, privKey.Public(), rsaPrivKey)
+		certDER, err = x509.CreateCertificate(rand.Reader, tmpl, caCert, privKey.Public(), k)
 	case *ecdsa.PrivateKey:
-		ecPrivKey, _ := caPrivKey.(*ecdsa.PrivateKey)
-		certDER, err = x509.CreateCertificate(rand.Reader, tmpl, caCert, privKey.Public(), ecPrivKey)
+		certDER, err = x509.CreateCertificate(rand.Reader, tmpl, caCert, privKey.Public(), k)
 	default:
-		return nil, nil, fmt.Errorf("invalid caPrivKey, got type %s", t)
+		return nil, nil, fmt.Errorf("invalid caPrivKey, got %v", k)
 	}
 	if err != nil {
 		return nil, nil, err
