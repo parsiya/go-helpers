@@ -1,7 +1,6 @@
 package certhelper
 
 import (
-	"bytes"
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"
@@ -17,8 +16,9 @@ func CertDERToPEM(certDER []byte) (certPEM []byte, err error) {
 		Type:  "CERTIFICATE",
 		Bytes: certDER,
 	}
-	if err := pem.Encode(bytes.NewBuffer(certPEM), pemBlock); err != nil {
-		return nil, err
+	certPEM = pem.EncodeToMemory(pemBlock)
+	if certPEM == nil {
+		return nil, fmt.Errorf("PEM encoding failed")
 	}
 	return certPEM, nil
 }
@@ -31,11 +31,7 @@ func CertDERToPEMFile(certDER []byte, filename string) error {
 		return err
 	}
 	// Do not overwrite the file.
-	err = filehelper.WriteFile(p, filename, false)
-	if err != nil {
-		return err
-	}
-	return nil
+	return filehelper.WriteFile(p, filename, false)
 }
 
 // CertToPEM converts cert *x509.Certificate to PEM.
@@ -45,8 +41,8 @@ func CertToPEM(cert *x509.Certificate) ([]byte, error) {
 }
 
 // CertToPEMFile converts cert *x509.Certificate to PEM and stores it in a file.
-func CertToPEMFile(cert *x509.Certificate, filename string) ([]byte, error) {
-	return nil, CertDERToPEMFile(cert.Raw, filename)
+func CertToPEMFile(cert *x509.Certificate, filename string) error {
+	return CertDERToPEMFile(cert.Raw, filename)
 }
 
 // KeyToPEM converts a private key (RSA or EC) to PEM.
@@ -69,8 +65,9 @@ func KeyToPEM(privKey interface{}) (keyPEM []byte, err error) {
 	default:
 		return nil, fmt.Errorf("unknown private key type, got %v", k)
 	}
-	if err = pem.Encode(bytes.NewBuffer(keyPEM), &pemBlock); err != nil {
-		return nil, err
+	keyPEM = pem.EncodeToMemory(&pemBlock)
+	if keyPEM == nil {
+		return nil, fmt.Errorf("PEM encoding failed")
 	}
 	return keyPEM, nil
 }
@@ -82,9 +79,5 @@ func KeyToPEMFile(privKey interface{}, filename string) error {
 	if err != nil {
 		return err
 	}
-	err = filehelper.WriteFile(p, filename, false)
-	if err != nil {
-		return err
-	}
-	return nil
+	return filehelper.WriteFile(p, filename, false)
 }
