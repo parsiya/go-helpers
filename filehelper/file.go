@@ -105,7 +105,7 @@ func ListFiles(root, pattern string) (files []string, err error) {
 		return files, err
 	}
 	if !exists {
-		return files, fmt.Errorf("shared.ListFiles: path %s does not exist", root)
+		return files, fmt.Errorf("filehelper.ListFiles: path %s does not exist", root)
 	}
 
 	err = filepath.Walk(root, func(file string, info os.FileInfo, walkErr error) error {
@@ -113,7 +113,7 @@ func ListFiles(root, pattern string) (files []string, err error) {
 		file = filepath.ToSlash(file)
 		match, matchErr := filepath.Match(pattern, file)
 		if matchErr != nil {
-			return fmt.Errorf("shared.ListFiles: match error %s", matchErr.Error())
+			return fmt.Errorf("filehelper.ListFiles: match error %s", matchErr.Error())
 		}
 		if match && !info.IsDir() {
 			relpath, relErr := filepath.Rel(root, file)
