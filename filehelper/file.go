@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 // FileExists returns true if a file exists.
@@ -76,4 +77,56 @@ func WriteFile(input []byte, file string, overwrite bool) error {
 // File is overwritten if overwrite is set to true.
 func WriteFileString(input string, file string, overwrite bool) error {
 	return WriteFile([]byte(input), file, overwrite)
+}
+
+// RemoveExtension removes the extension from a filename.
+func RemoveExtension(filename string) string {
+	ext := filepath.Ext(filename)
+	return filename[:len(filename)-len(ext)]
+}
+
+// AddExtension removes the old extension and adds a new one.
+func AddExtension(filename, ext string) string {
+	filename = RemoveExtension(filename)
+	// Return filename if extension is empty.
+	if ext == "" {
+		return filename
+	}
+	return filename + "." + ext
+}
+
+// ListFiles returns all files with a specific pattern under a path. The path
+// is relative to root. Pattern is the typical "shell file name pattern"
+// (e.g. *.exe or * to list all files).
+func ListFiles(root, pattern string) (files []string, err error) {
+	// Check if path exists.
+	exists, err := PathExists(root)
+	if err != nil {
+		return files, err
+	}
+	if !exists {
+		return files, fmt.Errorf("shared.ListFiles: path %s does not exist", root)
+	}
+
+	err = filepath.Walk(root, func(file string, info os.FileInfo, walkErr error) error {
+		// Convert file path to /, otherwise match will not work (for some reason).
+		file = filepath.ToSlash(file)
+		match, matchErr := filepath.Match(pattern, file)
+		if matchErr != nil {
+			return fmt.Errorf("shared.ListFiles: match error %s", matchErr.Error())
+		}
+		if match && !info.IsDir() {
+			relpath, relErr := filepath.Rel(root, file)
+			if relErr != nil {
+				// Theoretically this shouldn't happen because we are only parsing
+				// files under root, every file path should be relative to root.
+				// But if it does move on.
+				// files = append(files, file)
+				return nil
+			}
+			files = append(files, relpath)
+		}
+		return nil
+	})
+	return files, err
 }
